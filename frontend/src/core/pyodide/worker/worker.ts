@@ -17,7 +17,7 @@ import { ParentSchema } from "../rpc";
 import { Logger } from "../../../utils/Logger";
 import { TRANSPORT_ID } from "./constants";
 import { invariant } from "../../../utils/invariant";
-import { UserConfig } from "vite";
+import { UserConfig } from "@/core/config/config-schema";
 
 declare const self: Window & {
   pyodide: PyodideInterface;
@@ -74,7 +74,7 @@ const requestHandler = createRPCRequestHandler({
     code: string | null;
     fallbackCode: string;
     filename: string | null;
-    userConfig: UserConfig | null;
+    userConfig: UserConfig;
   }) => {
     await pyodideReadyPromise; // Make sure loading is done
 

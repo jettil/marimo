@@ -1,8 +1,7 @@
 /* Copyright 2024 Marimo. All rights reserved. */
-// @ts-expect-error - no types
-import { loader as createLoader, read, typeParsers } from "vega-loader";
 import { DataFormat } from "./types";
 import { isNumber } from "lodash-es";
+import { typeParsers, createLoader, read } from "./vega-loader";
 
 // Augment the typeParsers to support Date
 typeParsers.date = (value: string) => new Date(value).toISOString();

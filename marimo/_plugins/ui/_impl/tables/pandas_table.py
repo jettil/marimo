@@ -4,6 +4,8 @@ from __future__ import annotations
 from typing import Any
 
 from marimo._plugins.ui._impl.tables.table_manager import (
+    FieldType,
+    FieldTypes,
     TableManager,
     TableManagerFactory,
 )
@@ -27,17 +29,13 @@ class PandasTableManagerFactory(TableManagerFactory):
             def to_json(self) -> bytes:
                 return self.data.to_json(orient="records").encode("utf-8")
 
-            def select_rows(
-                self, indices: list[int]
-            ) -> TableManager[pd.DataFrame]:
+            def select_rows(self, indices: list[int]) -> TableManager[pd.DataFrame]:
                 return PandasTableManager(self.data.iloc[indices])
 
             def get_row_headers(
                 self,
             ) -> list[tuple[str, list[str | int | float]]]:
-                return PandasTableManager._get_row_headers_for_index(
-                    self.data.index
-                )
+                return PandasTableManager._get_row_headers_for_index(self.data.index)
 
             @staticmethod
             def is_type(value: Any) -> bool:
@@ -76,5 +74,32 @@ class PandasTableManagerFactory(TableManagerFactory):
                         return [(name, index.tolist())]  # type: ignore[list-item]
 
                 return []
+
+            def get_field_types(self) -> FieldTypes:
+                return {
+                    column: PandasTableManager._get_field_type(self.data[column])
+                    for column in self.data.columns
+                }
+
+            @staticmethod
+            def _get_field_type(series: pd.Series) -> FieldType:
+                dtype = str(series.dtype)
+                if dtype.startswith("int") or dtype.startswith("uint"):
+                    return "integer"
+                if dtype.startswith("float"):
+                    return "number"
+                if dtype == "object":
+                    return "string"
+                if dtype == "bool":
+                    return "boolean"
+                if dtype == "datetime64[ns]":
+                    return "date"
+                if dtype == "timedelta64[ns]":
+                    return "unknown"
+                if dtype == "category":
+                    return "string"
+                if dtype.startswith("complex"):
+                    return "unknown"
+                return "unknown"
 
         return PandasTableManager

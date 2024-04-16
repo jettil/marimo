@@ -18,6 +18,7 @@ import type {
   SaveUserConfigRequest,
   SnippetsResponse,
 } from "../../network/types";
+import { UserConfig } from "@/core/config/config-schema";
 
 export interface WasmController {
   /**
@@ -37,6 +38,7 @@ export interface WasmController {
     fallbackCode: string;
     filename: string | null;
     onMessage: (message: string) => void;
+    userConfig: UserConfig;
   }): Promise<SerializedBridge>;
 }
 
